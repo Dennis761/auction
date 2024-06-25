@@ -1,0 +1,12 @@
+// User Constants
+// export const FETCH_USERS_REQUEST = 'FETCH_USERS_REQUEST';
+// export const FETCH_USERS_SUCCESS = 'FETCH_USERS_SUCCESS';
+// export const FETCH_USERS_FAILURE = 'FETCH_USERS_FAILURE';
+
+// export const USER_JOINED = 'USER_JOINED';
+// export const USER_LEFT = 'USER_LEFT';
+
+export const LOGIN_USER_SUCCESS = 'LOGIN_USER_SUCCESS'
+export const LOGIN_USER_ERROR = 'LOGIN_USER_ERROR'
+
+export const CLEAR_ERROR = 'CLEAR_ERROR'
