@@ -10,7 +10,7 @@ const PriceAdjuster = ({ initialPrice, onPublish }) => {
   };
 
   const decreasePrice = () => {
-    setPrice(prevPrice => (prevPrice - 20 >= 0 ? prevPrice - 20 : 0));
+    setPrice(prevPrice => (prevPrice - 20 >= 0 || prevPrice - 20 <= initialPrice ? prevPrice - 20 : 0));
   };
 
   const handlePublish = () => {
@@ -21,7 +21,7 @@ const PriceAdjuster = ({ initialPrice, onPublish }) => {
     <Container>
       <Title>Adjust the Price</Title>
       <PriceControl>
-        <PriceDisplay>${price}</PriceDisplay>
+        <PriceDisplay>Your price: ${price}</PriceDisplay>
         <ButtonContainer>
           <Button onClick={increasePrice} className="up">
             <AiFillCaretUp/>
@@ -31,7 +31,7 @@ const PriceAdjuster = ({ initialPrice, onPublish }) => {
           </Button>
         </ButtonContainer>
       </PriceControl>
-      <PublishButton onClick={handlePublish}>Publish</PublishButton>
+      <PublishButton onClick={handlePublish}>Adjust</PublishButton>
     </Container>
   );
 };
@@ -46,30 +46,31 @@ const fadeIn = keyframes`
 `;
 
 const Container = styled.div`
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 20px;
-  width: 300px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1vh solid #ccc;
+  border-radius: 2vh;
+  padding: 2vh;
+  width: 55vh;
+  height: 20vh;
+  box-shadow: 0 4vh 6vh rgba(0, 0, 0, 0.1);
   text-align: center;
   background-color: #fff;
   animation: ${fadeIn} 0.5s ease-in-out;
 `;
 
 const Title = styled.h2`
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 2.5vh;
+  margin-bottom: 2vh;
 `;
 
 const PriceControl = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 1vh;
 `;
 
 const PriceDisplay = styled.div`
-  font-size: 28px;
+  font-size: 2.6vh;
   font-weight: bold;
   flex-grow: 1;
   text-align: left;
@@ -79,20 +80,20 @@ const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: 20px;
+  margin-left: 3vh;
 `;
 
 const Button = styled.button`
-  width: 50px;
-  height: 50px;
-  font-size: 24px;
+  width: 7vh;
+  height: 3.5vh;
+  font-size: 3.5vh;
   border: none;
-  border-radius: 5px;
+  border-radius: 1vh;
   background-color: #f0f0f0;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1vh 2vh rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s, transform 0.2s;
-  margin: 5px 0;
+  margin: 1vh 0;
 
   &.up {
     background-color: #4caf50;
@@ -119,10 +120,12 @@ const PublishButton = styled.button`
   background-color: #008cba;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 1vh;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 4vh;
+  width: 8vh;
+  font-size: 2vh;
+  box-shadow: 0 1vh 2vh rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s, transform 0.2s;
 
   &:hover {

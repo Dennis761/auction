@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import AuctionSessionReducer from './Reducers/AuctionSessionReducer.js';
-import membersListReducer from './Reducers/MembersListReducer.js'
+// import membersListReducer from './Reducers/MembersListReducer.js'
 import userInfoReducer from './Reducers/UserReducer.js'
 // import UserReducer from './Reducers/UserReducer.js';
 
 const store = configureStore({
   reducer: {
     auctionSession: AuctionSessionReducer,
-    membersList: membersListReducer,
+    // membersList: membersListReducer,
     userInfo: userInfoReducer,
     // users: UserReducer,
   },

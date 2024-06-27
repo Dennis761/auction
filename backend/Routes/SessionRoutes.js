@@ -7,10 +7,8 @@ const router = express.Router();
 
 console.log(router)
 
-router.post('/', createSession);
+router.post('/', checkAuth, createSession);
 router.get('/', getAllSessions);
 router.get('/:id', getSessionById);
-// router.get('/join/:id', checkAuth, joinSession);
-// router.get('/leave/:id', checkAuth, leaveSession);
 
 export default router;

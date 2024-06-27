@@ -1,4 +1,5 @@
 import axios from 'axios';
+import io from 'socket.io-client';
 import {
   FETCH_SESSIONS_REQUEST,
   FETCH_SESSIONS_SUCCESS,
@@ -11,8 +12,11 @@ import {
   FETCH_SESSION_BY_ID_FAILURE,
   JOIN_SESSION_REQUEST,
   JOIN_SESSION_SUCCESS,
-  JOIN_SESSION_FAILURE
+  JOIN_SESSION_FAILURE,
+  UPDATE_PARTICIPANTS
 } from '../Constants/AuctionSessionConstants.js';
+
+const socket = io('http://localhost:4444');
 
 // Fetch All Sessions
 export const fetchSessions = () => async (dispatch) => {
@@ -28,8 +32,7 @@ export const fetchSessions = () => async (dispatch) => {
         'Authorization': `Bearer ${token}`
       }
     });
-    const {data} = response
-    dispatch({ type: FETCH_SESSIONS_SUCCESS, payload: data });
+    dispatch({ type: FETCH_SESSIONS_SUCCESS, payload: response.data });
   } catch (error) {
     dispatch({ type: FETCH_SESSIONS_FAILURE, payload: error.message });
   }
@@ -50,12 +53,7 @@ export const createSession = (sessionData) => async (dispatch) => {
       }
     });
 
-    const { product } = response.data
-    if (data) {
-      dispatch({ type: CREATE_SESSION_SUCCESS, payload: product });
-    } else {
-      dispatch({ type: CREATE_SESSION_FAILURE, payload: 'No data found' });
-    }
+    dispatch({ type: CREATE_SESSION_SUCCESS, payload: response.data });
   } catch (error) {
     dispatch({ type: CREATE_SESSION_FAILURE, payload: error.message });
   }
@@ -70,37 +68,56 @@ export const fetchSessionById = (id) => async (dispatch) => {
       throw new Error('Token not found in local storage');
     }
 
-    const { data } = await axios.get(`http://localhost:4444/auctions/${id}`, {
+    const response = await axios.get(`http://localhost:4444/auctions/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
-    if (data) {
-      dispatch({ type: FETCH_SESSION_BY_ID_SUCCESS, payload: data });
-    } else {
-      dispatch({ type: FETCH_SESSION_BY_ID_FAILURE, payload: 'No data found' });
-    }
+    dispatch({ type: FETCH_SESSION_BY_ID_SUCCESS, payload: response.data });
   } catch (error) {
     dispatch({ type: FETCH_SESSION_BY_ID_FAILURE, payload: error.message });
   }
 };
 
 // Join Session
-// export const joinSession = (id, userData) => async (dispatch) => {
-//   dispatch({ type: JOIN_SESSION_REQUEST });
-//   try {
-//     const token = localStorage.getItem('token');
-//     if (!token) {
-//       throw new Error('Token not found in local storage');
-//     }
-    
-//     const { data } = await axios.post(`http://localhost:4444/auctions/${id}/join`, userData);
-//     if (data) {
-//       dispatch({ type: JOIN_SESSION_SUCCESS, payload: data });
-//     } else {
-//       dispatch({ type: JOIN_SESSION_FAILURE, payload: 'No data found' });
-//     }
-//   } catch (error) {
-//     dispatch({ type: JOIN_SESSION_FAILURE, payload: error.message });
-//   }
-// };
+export const joinSession = (sessionId) => (dispatch) => {
+  dispatch({ type: JOIN_SESSION_REQUEST });
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    socket.emit('joinAuction', { sessionId, token });
+
+    socket.on('updateParticipants', (participants) => {
+      dispatch({ type: UPDATE_PARTICIPANTS, payload: participants });
+      dispatch({ type: JOIN_SESSION_SUCCESS });
+    });
+  } else {
+    dispatch({ type: JOIN_SESSION_FAILURE, payload: 'Token not found in local storage' });
+  }
+};
+
+// Leave Session
+export const leaveSession = (sessionId) => (dispatch) => {
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    socket.emit('leaveAuction', { sessionId, token });
+
+    socket.on('updateParticipants', (participants) => {
+      dispatch({ type: UPDATE_PARTICIPANTS, payload: participants });
+    });
+  } else {
+    console.error('Token not found in local storage');
+  }
+};
+
+// Listen for Participants Updates
+export const listenForParticipantsUpdates = () => (dispatch) => {
+  socket.on('updateParticipants', (participants) => {
+    dispatch({ type: UPDATE_PARTICIPANTS, payload: participants });
+  });
+
+  return () => {
+    socket.off('updateParticipants');
+  };
+};

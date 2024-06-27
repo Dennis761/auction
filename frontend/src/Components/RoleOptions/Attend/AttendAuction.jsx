@@ -23,7 +23,7 @@ export default function AttendAuction() {
       backgroundSize: 'cover',
       backgroundAttachment: 'fixed',
       height: '100vh',
-      padding: '20px',
+      padding: '3vh',
     }}>
       <h2 style={{
         textAlign: 'center',

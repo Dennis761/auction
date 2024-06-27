@@ -1,17 +1,23 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { fetchSessionDetails, listenForParticipantsUpdates } from '../../../Redux/Actions/MembersListAction.js';
+import { fetchSessionById, listenForParticipantsUpdates } from '../../../Redux/Actions/AuctionSessionActions.js';
+import io from 'socket.io-client';
+
 // Стили для контейнера
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  text-align: center;
+  font-size: 3vh;
   align-items: center;
-  padding: 20px;
-  margin: 20px;
-  border: 2px solid #ccc;
-  border-radius: 15px;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 5vh;
+  width: 40vh;
+  height-min: 30vh
+  margin: 5vh;
+  border: 1vh solid #ccc;
+  border-radius: 4vh;
+  box-shadow: inset 0 0 2vh rgba(0, 0, 0, 0.1);
   background-color: #fff;
 `;
 
@@ -25,41 +31,50 @@ const ParticipantList = styled.ul`
 
 // Стили для элемента участника
 const ParticipantItem = styled.li`
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 10px;
-  background-color: ${props => props.isCurrentUser ? '#d0e7ff' : '#f9f9f9'}; /* Изменение цвета фона для текущего пользователя */
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive; /* Используйте необычный стиль шрифта */
+  padding: 1vh;
+  margin: 1vh 0;
+  border-radius: 2vh;
+  background-color: ${props => props.isCurrentUser ? '#d0e7ff' : '#f9f9f9'};
+  box-shadow: inset 0 0 1vh rgba(0, 0, 0, 0.1);
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive; 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   &:nth-child(odd) {
-    background-color: ${props => props.isCurrentUser ? '#d0e7ff' : '#e9e9e9'}; /* Изменение цвета фона для текущего пользователя */
+    background-color: ${props => props.isCurrentUser ? '#d0e7ff' : '#e9e9e9'};
   }
 `;
 
 // Стили для номера участника
 const ParticipantNumber = styled.span`
   font-weight: bold;
-  margin-right: 10px;
+  margin-right: 3vh;
 `;
 
 const AuctionMembersList = ({ sessionId }) => {
   const dispatch = useDispatch();
-  const participants = useSelector((state) => state.membersList.participants);
-  const loading = useSelector((state) => state.membersList.loading);
-  const error = useSelector((state) => state.membersList.error);
-  const currentUserId = localStorage.getItem('userId'); // Получение текущего ID пользователя из локального хранилища
+  const participants = useSelector((state) => state.auctionSession.participants || []);
+  const loading = useSelector((state) => state.auctionSession.loading);
+  const error = useSelector((state) => state.auctionSession.error);
+  const [currentUserId, setCurrentUserId] = React.useState(null);
 
   useEffect(() => {
-    dispatch(fetchSessionDetails(sessionId));
-    const stopListening = dispatch(listenForParticipantsUpdates());
+    const token = localStorage.getItem('token');
+    if (token) {
+      const socket = io('http://localhost:4444');
+      socket.emit('getUserId', { token }, (userId) => {
+        setCurrentUserId(userId);
+      });
 
-    return () => {
-      stopListening();
-    };
+      // dispatch(fetchSessionById(sessionId));
+      const stopListening = dispatch(listenForParticipantsUpdates());
+
+      return () => {
+        stopListening();
+        socket.disconnect();
+      };
+    }
   }, [dispatch, sessionId]);
 
   if (loading) {
@@ -72,12 +87,12 @@ const AuctionMembersList = ({ sessionId }) => {
 
   return (
     <Container>
-      <h2>Participants in Auction {sessionId}</h2>
+      <p>Top 10 Auction Participants</p>
       <ParticipantList>
         {participants.map((participant, index) => (
           <ParticipantItem 
             key={participant._id}
-            isCurrentUser={participant._id === currentUserId} // Передача пропса для проверки текущего пользователя
+            isCurrentUser={participant._id === currentUserId}
           >
             <ParticipantNumber>{index + 1}</ParticipantNumber>
             {participant.name}

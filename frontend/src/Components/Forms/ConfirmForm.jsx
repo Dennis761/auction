@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { joinSession } from '../../Redux/Actions/MembersListAction.js';
+import { joinSession } from '../../Redux/Actions/AuctionSessionActions.js';
 
 const ConfirmForm = ({ productId, onClose }) => {
   const dispatch = useDispatch();
