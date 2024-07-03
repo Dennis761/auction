@@ -10,8 +10,8 @@ import PriceAdjuster from './PriceAdjuster.jsx';
 import ProductDescription from '../../Product/ProductDescription.jsx';
 import ProductSummary from '../../Product/ProductSummary.jsx';
 import Timer from '../../Timer/Timer.jsx';
-import CongratsMessage from '../../Forms/CongratulationForm.jsx';
-import NoWinMessage from '../../Forms/NoWinForm.jsx';
+import CongratulationMessage from '../../Messages/CongratulationMessage.jsx';
+import NoWinMessage from '../../Messages/NoWinMessage.jsx';
 
 const fadeIn = keyframes`
   from {
@@ -111,7 +111,7 @@ const AttendAuctionProduct = () => {
     <Container>
       {auctionEnded ? (
         showCongrats ? (
-          <CongratsMessage />
+          <CongratulationMessage />
         ) : showNoWin ? (
           <NoWinMessage />
         ) : null

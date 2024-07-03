@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import AuctionSession from '../Models/AuctionSessionModel.js';
 import AuctionProduct from '../Models/AuctionProductModel.js';
+import { productValidator } from '../Validator/ProductValidator.js';
+import { validationResult } from 'express-validator';
 
 export const handleCreateAuction = (io, socket) => {
   socket.on('createAuction', async ({ token, productInfo }, callback) => {
@@ -8,12 +10,17 @@ export const handleCreateAuction = (io, socket) => {
       const decoded = jwt.verify(token, 'user-secret-code');
       const creatorId = decoded._id;
 
-      const { title, description, aboutProduct, imageURL, location, country, price, time } = productInfo;
+      const req = { body: productInfo };
 
-      if (!title || !description || !price || !time) {
-        callback({ status: 400, message: 'Missing required fields' });
+      await Promise.all(productValidator.map(validation => validation.run(req)));
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        callback({ status: 400, errors: errors.array() });
         return;
       }
+
+      const { title, description, aboutProduct, imageURL, location, country, price, time } = productInfo;
 
       const auctionProduct = new AuctionProduct({
         title,
@@ -39,7 +46,7 @@ export const handleCreateAuction = (io, socket) => {
       socket.join(newSession._id.toString());
       io.to(socket.id).emit('updateParticipants', newSession.participants);
 
-      callback({ status: 201, auctionProduct: savedProduct, newSession }); 
+      callback({ status: 201, auctionProduct: savedProduct, newSession });
     } catch (error) {
       console.error('Error creating auction or session:', error);
       callback({ status: 500, message: 'Internal server error' });
@@ -106,9 +113,9 @@ export const handleStartAuctionTimer = (io, socket) => {
   });
 };
 
-const startAuctionTimer = (io, sessionId, duration) => {
-  const endTime = Date.now() + duration * 1000;
-  console.log('endTime', endTime)
+const startAuctionTimer = (io, sessionId, time) => {
+  const endTime = Date.now() + time * 1000;
+
   const interval = setInterval(async () => {
     const currentTime = Date.now();
     if (currentTime >= endTime) {

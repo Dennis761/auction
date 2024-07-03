@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
-import ConfirmForm from '../Forms/ConfirmForm.jsx';
+import ConfirmMessage from '../Messages/ConfirmMessage.jsx';
 
 const ProductCarousel = ({ products }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -103,7 +103,7 @@ const ProductCarousel = ({ products }) => {
     <>
       <div style={carouselContainerStyle}>
         {formState && (
-          <ConfirmForm
+          <ConfirmMessage
             productName={products[currentIndex].product.title}
             sessionId={products[currentIndex].session._id}
             onClose={handleCloseForm}

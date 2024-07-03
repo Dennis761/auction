@@ -6,7 +6,7 @@ import ProductSummary from '../../Product/ProductSummary.jsx';
 import ProductDescription from '../../Product/ProductDescription.jsx';
 import AuctionMembersList from './AuctionMembersList.jsx';
 import AdminPanel from './AdminPanel.jsx';
-import SuccessMessage from '../../Forms/SuccessForm.jsx'
+import SuccessMessage from '../../Messages/SuccessMessage.jsx'
 import Timer from '../../Timer/Timer.jsx';
 
 const fadeIn = keyframes`

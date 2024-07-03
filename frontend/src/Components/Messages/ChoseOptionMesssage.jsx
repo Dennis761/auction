@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const ChooseOptionForm = () => {
+const ChooseOptionMessage = () => {
   const handleMouseEnter = (event) => {
     event.target.style.backgroundColor = '#555';
   };
@@ -78,4 +78,4 @@ const styles = {
   },
 };
 
-export default ChooseOptionForm;
+export default ChooseOptionMessage;

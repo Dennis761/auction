@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { joinSession } from '../../Redux/Actions/AuctionSessionActions.js';
 
-const ConfirmForm = ({ productName, sessionId, onClose }) => {
+const ConfirmMessage = ({ productName, sessionId, onClose }) => {
   const dispatch = useDispatch();
   const [isHovering, setIsHovering] = useState(false);
 
@@ -67,11 +67,11 @@ const styles = {
   },
   button: {
     padding: '1.5vh 3vh',
-    marginTop: '3vh', // Converted px to vh
-    marginLeft: '2vh', // Converted px to vh
+    marginTop: '3vh',
+    marginLeft: '2vh',
     cursor: 'pointer',
-    borderRadius: '0.75vh', // Converted px to vh
-    border: '0.15vh solid #ccc', // Converted px to vh
+    borderRadius: '0.75vh',
+    border: '0.15vh solid #ccc',
     background: 'white',
     transition: 'background 0.3s, color 0.3s',
   },
@@ -80,11 +80,11 @@ const styles = {
     color: 'white',
   },
   linkButton: {
-    padding: '1.5vh 3vh', // Converted px to vh
-    marginTop: '3vh', // Converted px to vh
-    marginRight: '2vh', // Converted px to vh
+    padding: '1.5vh 3vh',
+    marginTop: '3vh',
+    marginRight: '2vh',
     cursor: 'pointer',
-    borderRadius: '0.75vh', // Converted px to vh
+    borderRadius: '0.75vh',
     border: 'none',
     background: '#28a745',
     color: 'white',
@@ -93,4 +93,4 @@ const styles = {
   },
 };
 
-export default ConfirmForm;
+export default ConfirmMessage;

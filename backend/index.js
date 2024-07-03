@@ -4,8 +4,6 @@ import cors from 'cors';
 import http from 'http';
 import setupSocket from './SocketModel/socketHandler.js'; 
 
-import auctionRoutes from './Routes/SessionRoutes.js';
-import productRoutes from './Routes/ProductRoutes.js';
 import { login, register } from './Controllers/Login.js';
 
 const app = express();
@@ -29,8 +27,6 @@ mongoose
 
 app.post('/auth/login', login);
 app.post('/auth/registration', register)
-app.use('/auctions', auctionRoutes);
-app.use('/products', productRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello world!');

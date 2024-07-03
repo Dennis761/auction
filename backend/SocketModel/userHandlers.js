@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import User from '../Models/UserModel.js';
 
 export const handleGetUserId = (socket) => {
   socket.on('getUserId', ({ token }, callback) => {

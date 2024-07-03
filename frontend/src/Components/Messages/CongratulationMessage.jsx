@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import Confetti from 'react-confetti';
 
-const CongratsMessage = ({ username }) => {
+const CongratulationMessage = ({ username }) => {
   return (
     <Container>
       <Confetti />
@@ -65,4 +65,4 @@ const Description = styled.p`
   margin-top: 0;
 `;
 
-export default CongratsMessage;
+export default CongratulationMessage;

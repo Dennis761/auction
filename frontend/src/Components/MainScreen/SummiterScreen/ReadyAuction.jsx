@@ -1,7 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 
-// Анимация для появления сообщения
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -13,7 +12,6 @@ const fadeIn = keyframes`
   }
 `;
 
-// Дополнительная анимация для увеличения и уменьшения масштаба
 const pulse = keyframes`
   0% {
     transform: scale(1);
@@ -26,7 +24,6 @@ const pulse = keyframes`
   }
 `;
 
-// Стиль для контейнера сообщения
 const MessageContainer = styled.div`
   background-color: #4caf50;
   color: white;
@@ -41,7 +38,6 @@ const MessageContainer = styled.div`
   word-wrap: break-word;
 `;
 
-// Компонент сообщения
 const ReadyAuction = () => {
   return (
     <MessageContainer>

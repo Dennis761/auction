@@ -22,13 +22,13 @@ export default function AttendAuction() {
       backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url(${image})`,
       backgroundSize: 'cover',
       backgroundAttachment: 'fixed',
-      height: '100vh',
+      height: '110vh',
       padding: '3vh',
     }}>
       <h2 style={{
         textAlign: 'center',
         color: 'white',
-        fontSize: '7vh',
+        fontSize: '5vh',
         textShadow: `
         -0.15vh -0.15vh 0 #000,  
          0.15vh -0.15vh 0 #000,
@@ -39,7 +39,7 @@ export default function AttendAuction() {
         -0.15vh  0.15vh 0 #000,
          0.15vh  0.15vh 0 #000`
       }}>
-        Current open auction
+        Current open auctions
       </h2>
       <ProductCarousel products={sessions} />
     </div>

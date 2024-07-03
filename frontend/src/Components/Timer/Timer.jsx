@@ -35,7 +35,7 @@ function Timer({ initialSeconds }) {
 
   useEffect(() => {
     if (remainingTime !== null && !isRunning) {
-      setSeconds(Math.ceil(remainingTime / 1000)); // Convert milliseconds to whole seconds
+      setSeconds(Math.ceil(remainingTime / 1000));
       setIsRunning(true);
     }
   }, [remainingTime, isRunning]);
