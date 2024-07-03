@@ -4,7 +4,7 @@ import UserModel from '../Models/UserModel.js';
 
 export const getAllSessions = async (req, res) => {
   try {
-    const sessions = await AuctionSession.find();
+    const sessions = await AuctionSession.find({ open: true });
 
     const findProducts = await Promise.all(
       sessions.map(async (session) => {
@@ -19,51 +19,9 @@ export const getAllSessions = async (req, res) => {
   }
 };
 
-export const createSession = async (req, res) => {
-  try {
-    const creatorId = req.userId;
-    const { title, description, aboutProduct, imageURL, location, country, price, time } = req.body;
-
-    // Validate required fields
-    if (!title || !description || !price || !time) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    // Create a new auction product
-    const auctionProduct = new AuctionProduct({
-      title,
-      description,
-      aboutProduct,
-      imageURL,
-      location,
-      country,
-      price,
-      time
-    });
-
-    // Save the auction product
-    const savedProduct = await auctionProduct.save();
-
-    // Create a new auction session
-    const auctionSession = new AuctionSession({
-      creatorId,
-      _id: savedProduct._id,
-      time
-    });
-
-    // Save the auction session
-    const newSession = await auctionSession.save();
-
-    // Respond with the created session
-    res.status(201).json({auctionProduct, newSession});
-  } catch (err) {
-    console.error('Error creating session:', err);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
 export const getSessionById = async (req, res) => {
   try {
+
     const session = await AuctionSession.findById(req.params.id);
     const product = await AuctionProduct.findById(req.params.id);
     if (!session) {

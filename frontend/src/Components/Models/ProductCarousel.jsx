@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 import ConfirmForm from '../Forms/ConfirmForm.jsx';
-// import Timer from '../Timer/Timer.jsx'
 
 const ProductCarousel = ({ products }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [formState, setFormState] = useState(false);
-  console.log(products)
+
   const handlePrevClick = () => {
     console.log('Prev Clicked');
     setCurrentIndex((prevIndex) =>
@@ -92,7 +91,10 @@ const ProductCarousel = ({ products }) => {
   if (!products || products.length === 0) {
     return (
       <div style={carouselContainerStyle}>
-        <p>No products available</p>
+        <p style={{
+          fontSize: '5vh',
+          color: 'white'
+          }}>No products available</p>
       </div>
     );
   }
@@ -102,10 +104,11 @@ const ProductCarousel = ({ products }) => {
       <div style={carouselContainerStyle}>
         {formState && (
           <ConfirmForm
-            productId={products[currentIndex].product._id}
+            productName={products[currentIndex].product.title}
+            sessionId={products[currentIndex].session._id}
             onClose={handleCloseForm}
           />
-        )}
+        )} 
         {products.length > 1 && (
           <button
             style={buttonStyle}
@@ -143,7 +146,6 @@ const ProductCarousel = ({ products }) => {
           </button>
         )}
       </div>
-      {/* <Timer initialSeconds={products[currentIndex].time} /> */}
     </>
   );
 };

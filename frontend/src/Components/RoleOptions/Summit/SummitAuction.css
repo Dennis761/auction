@@ -29,7 +29,7 @@ h2 {
 
 .form-group input,
 .form-group textarea {
-  width: calc(100% - 22px); /* Подгонка ширины для учета padding и border */
+  width: calc(100% - 22px); 
   padding: 10px;
   border: 1px solid #cccccc;
   border-radius: 4px;
@@ -39,7 +39,7 @@ h2 {
 
 .form-group textarea {
   resize: vertical;
-  height: 100px; /* Устанавливаем фиксированную высоту для textarea */
+  height: 100px; 
 }
 
 .form-group input:focus,

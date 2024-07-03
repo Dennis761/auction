@@ -1,7 +1,6 @@
 import cron from 'node-cron';
 import AuctionSession from '../models/AuctionSession.js';
 
-// Периодическая задача, выполняемая каждую минуту
 cron.schedule('* * * * *', async () => {
   try {
     const now = Date.now();

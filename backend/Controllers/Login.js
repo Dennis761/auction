@@ -39,3 +39,40 @@ export const login = async (req, res) => {
         })
     }
 }
+
+export const register = async (req, res) => {
+    try{
+        
+    const password = req.body.password;
+    const salt = await bcrypt.genSalt(10)
+    const Hash = await bcrypt.hash(password, salt)
+
+    const createUser = new UserModel({
+        name: req.body.name,
+        email: req.body.email,
+        country: req.body.country,
+        passwordHash: Hash,
+        avatarURL: req.body.avatarURL,
+    })
+
+    const user = await createUser.save();
+
+        const token = jwt.sign({
+            _id: user._id
+        }, 'secret-code', {
+            expiresIn: '30d'
+        });
+
+        const {passwordHash, ...userData} = user._doc
+
+        res.status(200).json({
+            ...userData, 
+            token
+        })
+    } catch (error){
+    console.error(error)
+    res.status(500).json({
+        success: 'Failed to register'
+    })
+    }
+}

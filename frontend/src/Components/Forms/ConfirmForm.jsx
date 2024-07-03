@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { joinSession } from '../../Redux/Actions/AuctionSessionActions.js';
 
-const ConfirmForm = ({ productId, onClose }) => {
+const ConfirmForm = ({ productName, sessionId, onClose }) => {
   const dispatch = useDispatch();
   const [isHovering, setIsHovering] = useState(false);
 
   const handleConfirm = () => {
-    dispatch(joinSession(productId));
-  };
+    dispatch(joinSession(sessionId));
+  }; 
 
   const handleMouseEnter = () => {
     setIsHovering(true);
@@ -18,18 +18,17 @@ const ConfirmForm = ({ productId, onClose }) => {
   const handleMouseLeave = () => {
     setIsHovering(false);
   };
-
   return (
     <div style={styles.overlay}>
       <div style={styles.formContainer}>
-        <h2>Подтверждение</h2>
-        <p>Вы выбрали продукт с ID: {productId}</p>
-        <Link to={`/attend-auction-product/${productId}`}>
+        <h2>Confirm</h2>
+        <p>You want to attend in "{productName}" auction?</p>
+        <Link to={`/attend-auction-product/${sessionId}`}>
           <button
             style={styles.linkButton}
             onClick={handleConfirm}
           >
-            Перейти к продукту
+            Yes, I do
           </button>
         </Link>
         <button
@@ -38,7 +37,7 @@ const ConfirmForm = ({ productId, onClose }) => {
           onMouseLeave={handleMouseLeave}
           style={isHovering ? { ...styles.button, ...styles.buttonHover } : styles.button}
         >
-          Закрыть
+          Cancel
         </button>
       </div>
     </div>
@@ -56,18 +55,18 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000, // Ensure it overlays other content
+    zIndex: 1000,
   },
   formContainer: {
     background: 'white',
-    padding: '3vh', // Converted px to vh
-    borderRadius: '1vh', // Converted px to vh
-    boxShadow: '0 0.3vh 1.5vh rgba(0, 0, 0, 0.1)', // Converted px to vh
+    padding: '3vh',
+    borderRadius: '1vh',
+    boxShadow: '0 0.3vh 1.5vh rgba(0, 0, 0, 0.1)',
     textAlign: 'center',
-    zIndex: 1010, // Ensure it overlays the overlay
+    zIndex: 1010,
   },
   button: {
-    padding: '1.5vh 3vh', // Converted px to vh
+    padding: '1.5vh 3vh',
     marginTop: '3vh', // Converted px to vh
     marginLeft: '2vh', // Converted px to vh
     cursor: 'pointer',

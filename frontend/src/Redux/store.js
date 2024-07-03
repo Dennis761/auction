@@ -1,15 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
-import AuctionSessionReducer from './Reducers/AuctionSessionReducer.js';
-// import membersListReducer from './Reducers/MembersListReducer.js'
-import userInfoReducer from './Reducers/UserReducer.js'
-// import UserReducer from './Reducers/UserReducer.js';
+import auctionSessionReducer from './Reducers/AuctionSessionReducer.js';
+import {loginReducer, createNewUserReducer } from './Reducers/LoginReducer.js'
+import organizerReducer from './Reducers/OrganizerReducer.js';
+import userReducer from './Reducers/UserReducer.js'
 
 const store = configureStore({
   reducer: {
-    auctionSession: AuctionSessionReducer,
-    // membersList: membersListReducer,
-    userInfo: userInfoReducer,
-    // users: UserReducer,
+    auctionSession: auctionSessionReducer,
+    user: userReducer,
+    login: loginReducer,
+    createNewUser: createNewUserReducer,
+    organizer: organizerReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

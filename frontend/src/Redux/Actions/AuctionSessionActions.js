@@ -1,123 +1,145 @@
-import axios from 'axios';
 import io from 'socket.io-client';
 import {
   FETCH_SESSIONS_REQUEST,
   FETCH_SESSIONS_SUCCESS,
   FETCH_SESSIONS_FAILURE,
-  CREATE_SESSION_REQUEST,
-  CREATE_SESSION_SUCCESS,
-  CREATE_SESSION_FAILURE,
   FETCH_SESSION_BY_ID_REQUEST,
   FETCH_SESSION_BY_ID_SUCCESS,
   FETCH_SESSION_BY_ID_FAILURE,
   JOIN_SESSION_REQUEST,
   JOIN_SESSION_SUCCESS,
   JOIN_SESSION_FAILURE,
-  UPDATE_PARTICIPANTS
+  LEAVE_SESSION_REQUEST,
+  LEAVE_SESSION_SUCCESS,
+  LEAVE_SESSION_FAILURE,
+  PLACE_BID_REQUEST,
+  PLACE_BID_SUCCESS,
+  PLACE_BID_FAILURE,
+  UPDATE_PARTICIPANTS,
+  UPDATE_REMAINING_TIME,
+  AUCTION_ENDED
 } from '../Constants/AuctionSessionConstants.js';
 
 const socket = io('http://localhost:4444');
 
-// Fetch All Sessions
-export const fetchSessions = () => async (dispatch) => {
-  try {
-    dispatch({ type: FETCH_SESSIONS_REQUEST });
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Token not found in local storage');
-    }
+export const fetchSessions = () => (dispatch) => {
+  dispatch({ type: FETCH_SESSIONS_REQUEST });
 
-    const response = await axios.get('http://localhost:4444/auctions', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    dispatch({ type: FETCH_SESSIONS_SUCCESS, payload: response.data });
-  } catch (error) {
-    dispatch({ type: FETCH_SESSIONS_FAILURE, payload: error.message });
-  }
+  socket.emit('fetchSessions', (response) => {
+    if (response.status === 200) {
+      dispatch({ type: FETCH_SESSIONS_SUCCESS, payload: response.findProducts });
+    } else {
+      dispatch({ type: FETCH_SESSIONS_FAILURE, payload: response.message });
+    }
+  });
 };
 
-// Create Session 
-export const createSession = (sessionData) => async (dispatch) => {
-  try {
-    dispatch({ type: CREATE_SESSION_REQUEST });
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Token not found in local storage');
-    }
-
-    const response = await axios.post('http://localhost:4444/auctions', sessionData, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    dispatch({ type: CREATE_SESSION_SUCCESS, payload: response.data });
-  } catch (error) {
-    dispatch({ type: CREATE_SESSION_FAILURE, payload: error.message });
-  }
-};
-
-// Fetch Session by ID
-export const fetchSessionById = (id) => async (dispatch) => {
+export const fetchSessionById = (sessionId) => (dispatch) => {
   dispatch({ type: FETCH_SESSION_BY_ID_REQUEST });
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Token not found in local storage');
+  socket.emit('fetchSessionById', { sessionId }, (response) => {
+    if (response.status === 200) {
+      dispatch({ type: FETCH_SESSION_BY_ID_SUCCESS, 
+        payload: {
+          session: response.session,
+          product: response.product
+        } 
+      });
+      socket.on('updateTime', ({ remainingTime }) => {
+        dispatch({ type: UPDATE_REMAINING_TIME, payload: remainingTime });
+      });
+      socket.on('auctionEnded', ({ sessionId }) => {
+        dispatch({ type: AUCTION_ENDED, payload: sessionId });
+      });
+    } else {
+      dispatch({ type: FETCH_SESSION_BY_ID_FAILURE, payload: response.message });
     }
-
-    const response = await axios.get(`http://localhost:4444/auctions/${id}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    dispatch({ type: FETCH_SESSION_BY_ID_SUCCESS, payload: response.data });
-  } catch (error) {
-    dispatch({ type: FETCH_SESSION_BY_ID_FAILURE, payload: error.message });
-  }
+  });
 };
 
-// Join Session
-export const joinSession = (sessionId) => (dispatch) => {
+export const joinSession = (sessionId, bid) => (dispatch, getState) => {
   dispatch({ type: JOIN_SESSION_REQUEST });
+
   const token = localStorage.getItem('token');
-
-  if (token) {
-    socket.emit('joinAuction', { sessionId, token });
-
-    socket.on('updateParticipants', (participants) => {
-      dispatch({ type: UPDATE_PARTICIPANTS, payload: participants });
-      dispatch({ type: JOIN_SESSION_SUCCESS });
-    });
-  } else {
+  if (!token) {
     dispatch({ type: JOIN_SESSION_FAILURE, payload: 'Token not found in local storage' });
+    return;
   }
+  
+  const userId = getState().user.userId;
+
+  socket.emit('joinAuction', { sessionId, token, bid }, (response) => {
+    if (response.status === 200) {
+      dispatch({ type: JOIN_SESSION_SUCCESS, payload: userId });
+      dispatch({ type: UPDATE_PARTICIPANTS, payload: response.participants });
+    } else {
+      dispatch({ type: JOIN_SESSION_FAILURE, payload: response.message });
+    }
+  });
 };
 
-// Leave Session
-export const leaveSession = (sessionId) => (dispatch) => {
+export const leaveSession = (sessionId) => (dispatch, getState) => {
+  dispatch({ type: LEAVE_SESSION_REQUEST });
+
   const token = localStorage.getItem('token');
-
-  if (token) {
-    socket.emit('leaveAuction', { sessionId, token });
-
-    socket.on('updateParticipants', (participants) => {
-      dispatch({ type: UPDATE_PARTICIPANTS, payload: participants });
-    });
-  } else {
-    console.error('Token not found in local storage');
+  if (!token) {
+    dispatch({ type: LEAVE_SESSION_FAILURE, payload: 'Token not found in local storage' });
+    return;
   }
+
+  const userId = getState().user.userId;
+
+  socket.emit('leaveAuction', { sessionId, token }, (response) => {
+    if (response.status === 200) {
+      dispatch({ type: LEAVE_SESSION_SUCCESS, payload: userId });
+      dispatch({ type: UPDATE_PARTICIPANTS, payload: response.participants });
+    } else {
+      dispatch({ type: LEAVE_SESSION_FAILURE, payload: response.message });
+    }
+  });
 };
 
-// Listen for Participants Updates
 export const listenForParticipantsUpdates = () => (dispatch) => {
-  socket.on('updateParticipants', (participants) => {
+  const updateParticipants = (participants) => {
     dispatch({ type: UPDATE_PARTICIPANTS, payload: participants });
+  };
+
+  socket.on('updateParticipants', updateParticipants);
+
+  return () => {
+    socket.off('updateParticipants', updateParticipants);
+  };
+};
+
+export const placeBid = (sessionId, bid) => (dispatch) => {
+  dispatch({ type: PLACE_BID_REQUEST });
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    dispatch({ type: PLACE_BID_FAILURE, payload: 'Token not found in local storage' });
+    return;
+  }
+
+  socket.emit('placeBid', { token, sessionId, bid }, (response) => {
+    if (response.status === 200) {
+      dispatch({ type: PLACE_BID_SUCCESS, payload: { userId: response.userId, bid: response.bid } });
+      dispatch({ type: UPDATE_PARTICIPANTS, payload: response.participants });
+    } else {
+      dispatch({ type: PLACE_BID_FAILURE, payload: response.message });
+    }
+  });
+};
+
+export const listenForTimerUpdates = (sessionId) => (dispatch) => {
+  socket.on('updateTime', ({ remainingTime }) => {
+    dispatch({ type: UPDATE_REMAINING_TIME, payload: remainingTime });
+  });
+
+  socket.on('auctionEnded', ({ sessionId }) => {
+    dispatch({ type: AUCTION_ENDED, payload: sessionId });
   });
 
   return () => {
-    socket.off('updateParticipants');
+    socket.off('updateTime');
+    socket.off('auctionEnded');
   };
 };

@@ -7,8 +7,15 @@ const auctionSessionSchema = new mongoose.Schema({
     ref: 'User'
   },
   participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User' 
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    bid: {
+      type: Number,
+      required: true,
+      default: 0
+    }
   }],
   _id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -18,6 +25,10 @@ const auctionSessionSchema = new mongoose.Schema({
   time: {
     type: Number,
     required: true
+  },
+  open: {
+    type: Boolean,
+    default: true
   }
 });
 

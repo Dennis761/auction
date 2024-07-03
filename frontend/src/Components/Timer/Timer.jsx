@@ -1,52 +1,73 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
+
+const TimerContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 40vh;
+  width: 40vh;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 2vh;
+`;
+
+const TimerDisplay = styled.div`
+  font-size: 8vh;
+  padding: 2vh;
+  height: 8vh; 
+  width: 20vh; 
+  border: 0.3vh solid #61dafb;
+  border-radius: 3.5vh;
+  transition: all 0.5s ease;
+  color: ${props => (props.seconds < 20 ? 'red' : 'black')};
+  transform: ${props => (props.seconds < 20 ? 'scale(1.2)' : 'scale(1)')};
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 function Timer({ initialSeconds }) {
-  const [seconds, setSeconds] = useState(initialSeconds);
+  const remainingTime = useSelector((state) => state.organizer.remainingTime);
+  const [seconds, setSeconds] = useState(initialSeconds || 0);
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    if (seconds > 0) {
+    if (remainingTime !== null && !isRunning) {
+      setSeconds(Math.ceil(remainingTime / 1000)); // Convert milliseconds to whole seconds
+      setIsRunning(true);
+    }
+  }, [remainingTime, isRunning]);
+
+  useEffect(() => {
+    if (isRunning && seconds > 0) {
       const intervalId = setInterval(() => {
-        setSeconds(prevSeconds => prevSeconds - 1);
+        setSeconds(prevSeconds => {
+          const newSeconds = Math.max(0, prevSeconds - 1);
+          if (newSeconds === 0) {
+            setIsRunning(false);
+          }
+          return newSeconds;
+        });
       }, 1000);
 
-      // Очистка интервала при размонтировании компонента
       return () => clearInterval(intervalId);
     }
-  }, [seconds]);
+  }, [isRunning, seconds]);
 
-  // Функция для форматирования времени в мм:сс
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const timerContainerStyle = {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    height: '100vh',
-    width: '100vw',
-    fontFamily: 'Courier New, Courier, monospace',
-    padding: '2vh'
-  };
-
-  const timerStyle = {
-    padding: '2vh',
-    border: '0.3vh solid #61dafb',
-    borderRadius: '1vh',
-    transition: 'all 0.5s ease',
-    color: seconds < 20 ? 'red' : 'black',
-    transform: seconds < 20 ? 'scale(1.2)' : 'scale(1)',
-    backgroundColor: 'transparent'
-  };
-
-  return (
-    <div style={timerContainerStyle}>
-      <div style={timerStyle}>
+  return ( 
+    <TimerContainer>
+      <TimerDisplay seconds={seconds}>
         {formatTime(seconds)}
-      </div>
-    </div>
+      </TimerDisplay>
+    </TimerContainer>
   );
 }
 
