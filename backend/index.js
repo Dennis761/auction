@@ -1,42 +1,31 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import http from 'http';
-import setupSocket from './SocketModel/socketHandler.js'; 
+import dotenv from 'dotenv';
+import setupSocket from './SocketModel/socketHandler.js';
+import connectDB from './Services/db.js';
+import authRoutes from './Routes/authRoutes.js'; // Import routes
 
-import { login, register } from './Controllers/Login.js';
+dotenv.config(); // Load environment variables
 
 const app = express();
 const server = http.createServer(app);
-const io = setupSocket(server); 
+const io = setupSocket(server);
 
-const PORT = 4444;
-const db = 'mongodb+srv://millerden45:qetuo159@cluster0.ufrk5m5.mongodb.net/blog?retryWrites=true&w=majority';
+const PORT = process.env.PORT || 4444; // Get PORT from .env
 
 app.use(cors());
 app.use(express.json());
 
-mongoose
-  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to the database');
-  })
-  .catch((err) => {
-    console.error('Error connecting to the database:', err);
-  });
+connectDB(); // Connect to MongoDB
 
-app.post('/auth/login', login);
-app.post('/auth/registration', register)
-
-app.get('/', (req, res) => {
-  res.send('Hello world!');
-});
+// Register routes
+app.use('/auth', authRoutes);
 
 server.listen(PORT, (err) => {
   if (err) {
-    return console.error(err);
+    console.error(err);
   } else {
-    return 
-    (`Server running on PORT:${PORT}`);
+    console.log(`Server running on PORT:${PORT}`);
   }
 });
